@@ -1,0 +1,256 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{Specyfikacja techniczna systemu do licytacji brydżowej}
+\author{Wojciech Romanowski}
+\date{Czerwiec 2025}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Wprowadzenie}
+Dokument opisuje specyfikację techniczną systemu do licytacji brydżowej, który umożliwia rozgrywanie wirtualnych partii brydża z pełnym procesem licytacji i obliczania wyników.
+
+\section{Opis klas}
+
+\subsection{Player}
+Klasa reprezentująca gracza.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{String nick} - nazwa gracza
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Player(String nick)} - konstruktor tworzący gracza o podanym pseudonimie
+    \end{itemize}
+\end{itemize}
+
+\subsection{Team}
+Klasa reprezentująca drużynę (parę graczy).
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{String name} - nazwa drużyny
+        \item \texttt{Player player1, player2} - gracze w drużynie
+        \item \texttt{List<Integer> scores} - lista wyników z poszczególnych rund
+        \item \texttt{int totalScore} - suma punktów drużyny
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Team(Player p1, Player p2, String name)} - konstruktor tworzący drużynę
+        \item \texttt{void addScore(int score)} - dodaje wynik do historii drużyny
+        \item \texttt{int average\_score()} - oblicza średni wynik drużyny
+        \item \texttt{void displayStats()} - wyświetla statystyki drużyny
+    \end{itemize}
+\end{itemize}
+
+\subsection{Round}
+Klasa reprezentująca rundę gry.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{List<Bidding> biddings} - lista odzywiek w licytacji
+        \item \texttt{Contract contract} - kontrakt ustalony w rundzie
+        \item \texttt{int nsScore, ewScore} - wyniki drużyn NS i EW
+        \item \texttt{int roundNumber} - numer rundy
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Round(int roundNumber)} - konstruktor tworzący rundę
+        \item \texttt{void addBidding(Bidding bid)} - dodaje odzywkę do licytacji
+    \end{itemize}
+\end{itemize}
+
+\subsection{Game}
+Klasa zarządzająca całą grą.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{Team teamNS, teamEW} - drużyny North-South i East-West
+        \item \texttt{int scoreNS, scoreEW} - aktualne wyniki drużyn
+        \item \texttt{List<List<Bidding>> biddingSequence} - sekwencje licytacji
+        \item \texttt{List<Round> rounds} - lista rund
+        \item \texttt{Table table} - układ graczy przy stole
+        \item \texttt{int currentRound, maxRounds} - aktualna i maksymalna liczba rund
+        \item \texttt{boolean gameFinished} - czy gra zakończona
+        \item \texttt{boolean nsVulnerable, ewVulnerable} - status "vulnerable" drużyn
+        \item \texttt{LocalDateTime startTime, endTime} - czas rozpoczęcia i zakończenia
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Game(Team ns, Team ew, Table table, int maxRounds)} - konstruktor
+        \item \texttt{void add\_bidding(int round, Bidding bid)} - dodaje odzywkę
+        \item \texttt{void displayBidding()} - wyświetla historię licytacji
+        \item \texttt{boolean nextRound()} - rozpoczyna nową rundę
+        \item \texttt{void updateVulnerability()} - aktualizuje status vulnerable
+        \item \texttt{void displayScoreHistory()} - pokazuje historię wyników
+        \item \texttt{void displayRoundSummary()} - podsumowuje rundę
+        \item \texttt{Round getCurrentRound()} - zwraca aktualną rundę
+        \item \texttt{void startNewRound()} - inicjalizuje nową rundę
+        \item \texttt{String getGameInfo()} - zwraca podstawowe informacje o grze
+        \item \texttt{String getFullGameData()} - zwraca pełne dane gry do zapisu
+    \end{itemize}
+\end{itemize}
+
+\subsection{Scoreboard}
+Klasa reprezentująca tablicę wyników.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{int round} - numer rundy
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{void displayScores(Team ns, Team ew, int scoreNS, int scoreEW)} - wyświetla wyniki
+    \end{itemize}
+\end{itemize}
+
+\subsection{Table}
+Klasa reprezentująca stół do gry.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{Player north, east, south, west} - gracze na pozycjach
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{void assignPositions(Player n, Player e, Player s, Player w)} - przypisuje graczy
+        \item \texttt{Team getNSTeam()} - zwraca drużynę NS
+        \item \texttt{Team getEWTeam()} - zwraca drużynę EW
+    \end{itemize}
+\end{itemize}
+
+\subsection{Bidding}
+Klasa reprezentująca odzywkę w licytacji.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{Player player} - gracz składający odzywkę
+        \item \texttt{String bid} - treść odzywki
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Bidding(Player player, String bid)} - konstruktor
+        \item \texttt{String toString()} - reprezentacja tekstowa odzywki
+    \end{itemize}
+\end{itemize}
+
+\subsection{Contract}
+Klasa reprezentująca kontrakt brydżowy.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{Team declaringTeam, undeclaringTeam} - drużyny
+        \item \texttt{int level} - poziom kontraktu
+        \item \texttt{String suit} - kolor
+        \item \texttt{int result} - wynik (nadróbki/niedóróbki)
+        \item \texttt{boolean doubled, redoubled} - czy kontra/rekontra
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{Contract(Team d, Team u, int level, String suit, int result, boolean doubled, boolean redoubled)} - konstruktor
+        \item \texttt{int calculateScore(boolean isDeclarerVulnerable)} - oblicza wynik
+        \item \texttt{int calculateContractPoints(int level, String suit)} - oblicza punkty za kontrakt
+        \item \texttt{int colorValue(String color)} - wartość koloru
+        \item \texttt{int calculatePenalty(int undertricks, boolean doubled, boolean redoubled, boolean vulnerable)} - oblicza kary
+    \end{itemize}
+\end{itemize}
+
+\subsection{History}
+Klasa zarządzająca historią gier.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{List<Game> gamesHistory} - lista rozegranych gier
+        \item \texttt{Scoreboard scoreboard} - tablica wyników
+        \item \texttt{private static final String HISTORY\_FILE} - plik historii
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{History()} - konstruktor
+        \item \texttt{void add\_game(Game game)} - dodaje grę do historii
+        \item \texttt{void displayGamesList()} - wyświetla listę gier
+        \item \texttt{void displayGameDetails(int gameIndex)} - pokazuje szczegóły gry
+        \item \texttt{private void saveHistoryToFile()} - zapisuje historię do pliku
+        \item \texttt{private void loadHistoryFromFile()} - wczytuje historię z pliku
+    \end{itemize}
+\end{itemize}
+
+\subsection{GameManager}
+Główna klasa zarządzająca rozgrywką.
+
+\begin{itemize}
+    \item Pola:
+    \begin{itemize}
+        \item \texttt{private List<Player> players} - lista graczy
+        \item \texttt{History history} - historia gier
+        \item \texttt{private Scanner scanner} - do odczytu wejścia
+    \end{itemize}
+    
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{GameManager()} - konstruktor
+        \item \texttt{void start()} - główna pętla programu
+        \item \texttt{private void playNewGame()} - rozpoczyna nową grę
+        \item \texttt{private void setupPlayers()} - konfiguruje graczy
+        \item \texttt{Game setupGame()} - przygotowuje grę
+        \item \texttt{void playBidding(Game game)} - przeprowadza licytację
+        \item \texttt{private void createContract(Game game, String lastBid, boolean doubled, boolean redoubled)} - tworzy kontrakt
+        \item \texttt{boolean isValidBid(String bid)} - sprawdza poprawność odzywki
+        \item \texttt{boolean isHigherBid(String newBid, String lastBid)} - porównuje odzywki
+        \item \texttt{int parseResult(String resultStr)} - parsuje wynik
+        \item \texttt{void browseHistory()} - przegląda historię
+        \item \texttt{void displayGameSummary(Game game)} - podsumowuje grę
+        \item \texttt{void info()} - wyświetla informacje pomocnicze
+    \end{itemize}
+\end{itemize}
+
+\subsection{BridgeBidding}
+Klasa główna programu.
+
+\begin{itemize}
+    \item Metody:
+    \begin{itemize}
+        \item \texttt{void main(String[] args)} - punkt wejścia programu
+    \end{itemize}
+\end{itemize}
+
+\section{Opis funkcjonalności}
+Program implementuje następujące funkcjonalności:
+\begin{itemize}
+    \item Tworzenie graczy i drużyn
+    \item Przeprowadzanie licytacji zgodnie z zasadami brydża
+    \item Obliczanie wyników kontraktów z uwzględnieniem kontr i rekontr
+    \item Śledzenie statusu vulnerable drużyn
+    \item Zapisywanie i wczytywanie historii rozgrywek
+    \item Generowanie statystyk i podsumowań
+\end{itemize}
+
+\end{document}
